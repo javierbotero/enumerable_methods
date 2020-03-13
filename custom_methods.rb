@@ -132,17 +132,37 @@ module Enumerable
     end
 
     def my_inject (memo = false, symbol = false)      
-      memo = self[0] if memo
-      if memo && symbol 
+      if memo && symbol
+        i = 0
+        while i < length
+          memo = memo.send(symbol, self[i])  
+          i += 1 
+        end
+        return memo
+      elsif memo && block_given?
+        i = 0
+        while i < length
+          memo = yield memo, self[i] 
+          i += 1  
+        end
+        return memo
+      elsif memo    
+        sum = self[0]
+        i = 1 
+        while i < length
+          sum = sum.send(memo, self[i])
+          i += 1
+        end
+        return sum
+      else
+        memo = self[0]
         i = 1
         while i < length
-          memo = memo + symbol + self[i]  
-        end 
-
-        while i < length
-          memo += self[i]
+          memo = yield memo, self[i] 
+          i += 1
         end
-      end
+        return memo
+      end  
     end
 
 end
