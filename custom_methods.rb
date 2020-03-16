@@ -2,7 +2,11 @@
 # rubocop:disable Metrics/ModuleLength
 module Enumerable
   def change_self
-    Array self if self.class == Range
+    if self.class == Range
+      return Array self
+    else
+      return self
+    end
   end
 
   def my_each
@@ -34,11 +38,7 @@ module Enumerable
     return to_enum unless block_given?
 
     arr = []
-    i = 0
-    while i < my_array.length
-      arr.push(my_array[i]) if yield my_array[i]
-      i += 1
-    end
+    my_array.my_each { |x| arr.push(x) if yield x } 
     arr
   end
 
@@ -129,7 +129,7 @@ module Enumerable
       memo
     else
       memo = 0
-      my_array.my_each { |item| memo = yield item }
+      my_array.my_each { |item| memo += yield item }
       memo
     end
   end
