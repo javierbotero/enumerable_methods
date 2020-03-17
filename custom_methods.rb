@@ -121,11 +121,11 @@ module Enumerable
       my_array.my_each { |item| memo = yield memo, item }
       memo
     elsif memo.class == Symbol
-      sum = 0
-      my_array.my_each { |item| sum = sum.send(memo, item) }
+      sum = self[0]
+      my_array.my_each_with_index { |item, index| sum = sum.send(memo, item) unless 0 == index }
       sum
     elsif memo.class == Integer
-      my_array.my_each { |item| memo += item }
+      my_array.my_each { |item| memo = yield item }
       memo
     else
       memo = 0
