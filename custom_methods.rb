@@ -52,6 +52,11 @@ module Enumerable
       my_all? { |item| item }
     end
   end
+  
+  def regex_helper(my_array, regex=false, &block) 
+    my_array.my_each { |item| return true if (regex === item || regex == item || regex == item.class) }
+    false
+  end
 
   def my_any?(regex = false, &block)
     my_array = change_self
@@ -59,8 +64,7 @@ module Enumerable
       my_array.my_each { |item| return true if block.call(item) }
       false
     elsif regex
-      my_array.my_each { |item| return true if regex === item }
-      false
+     regex_helper(my_array, regex, &block)
     else
       my_any? { |item| item }
     end
@@ -68,7 +72,7 @@ module Enumerable
 
   def my_none?(_regex = false, &block)
     my_array = change_self
-    return true unless my_array.my_any?(_regex = false, &block)
+    return true unless my_array.my_any?(_regex, &block)
 
     false
   end
