@@ -66,9 +66,10 @@ module Enumerable
     end
   end
 
-  def my_none?(regex = false, &block)
+  def my_none?(_regex = false, &block)
     my_array = change_self
-    return true unless my_array.my_any?(regex = false, &block)
+    return true unless my_array.my_any?(_regex = false, &block)
+
     false
   end
 
@@ -90,7 +91,7 @@ module Enumerable
     my_array = change_self
     arr = []
     if block_given? && !proc
-      my_array.my_each { |item| arr.push(yield item ) }
+      my_array.my_each { |item| arr.push(yield item) }
       arr
     elsif (block_given? && proc) || proc
       my_array.my_each { |item| arr.push(proc.call(item)) }
@@ -103,21 +104,19 @@ module Enumerable
   # rubocop:disable Metrics/CyclomaticComplexity
   # rubocop:disable Metrics/PerceivedComplexity
 
-  def my_inject(memo = "a", symbol = false)
+  def my_inject(memo = 'a', symbol = false)
     my_array = change_self
-    if memo != "a" && symbol
+    if memo != 'a' && symbol
       my_array.my_each { |item| memo = memo.send(symbol, item) }
       memo
     elsif memo.class == Symbol
       result = my_array[0]
       my_array.my_each_with_index { |item, index| result = result.send(memo, item) unless index.zero? }
       result
-    elsif memo != "a"
-      puts "some memo is given"
+    elsif memo != 'a'
       my_array.my_each { |item| memo = yield memo, item }
       memo
     else
-      puts "no memo given default is a"
       result = my_array[0]
       my_array.my_each_with_index { |item, index| result = yield result, item unless index.zero? }
       result
