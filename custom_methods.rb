@@ -53,10 +53,10 @@ module Enumerable
     end
   end
 
-  def my_any?(regex = false)
+  def my_any?(regex = false, &block)
     my_array = change_self
     if block_given?
-      my_array.my_each { |item| return true if yield item }
+      my_array.my_each { |item| return true if block.call(item) }
       false
     elsif regex
       my_array.my_each { |item| return true if regex === item }
@@ -66,17 +66,10 @@ module Enumerable
     end
   end
 
-  def my_none?(regex = false)
+  def my_none?(regex = false, &block)
     my_array = change_self
-    if block_given?
-      my_array.my_each { |item| return false if yield item }
-      true
-    elsif regex
-      my_array.my_each { |item| return false if regex === item }
-      true
-    else
-      my_none? { |item| item }
-    end
+    return true unless my_array.my_any?(regex = false, &block)
+    false
   end
 
   def my_count(item = false)
@@ -96,10 +89,10 @@ module Enumerable
   def my_map(proc = false)
     my_array = change_self
     arr = []
-    if block_given?
-      my_array.my_each { |item| arr.push(yield item) }
+    if block_given? && !proc
+      my_array.my_each { |item| arr.push(yield item ) }
       arr
-    elsif proc
+    elsif (block_given? && proc) || proc
       my_array.my_each { |item| arr.push(proc.call(item)) }
       arr
     else
@@ -110,20 +103,21 @@ module Enumerable
   # rubocop:disable Metrics/CyclomaticComplexity
   # rubocop:disable Metrics/PerceivedComplexity
 
-  def my_inject(memo = false, symbol = false)
+  def my_inject(memo = "a", symbol = false)
     my_array = change_self
-    if memo && symbol
+    if memo != "a" && symbol
       my_array.my_each { |item| memo = memo.send(symbol, item) }
       memo
     elsif memo.class == Symbol
       result = my_array[0]
       my_array.my_each_with_index { |item, index| result = result.send(memo, item) unless index.zero? }
       result
-    elsif memo
-      result = 0
-      my_array.my_each { |item| result = yield memo, item }
-      result
+    elsif memo != "a"
+      puts "some memo is given"
+      my_array.my_each { |item| memo = yield memo, item }
+      memo
     else
+      puts "no memo given default is a"
       result = my_array[0]
       my_array.my_each_with_index { |item, index| result = yield result, item unless index.zero? }
       result
