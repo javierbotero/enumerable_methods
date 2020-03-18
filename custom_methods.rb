@@ -119,15 +119,15 @@ module Enumerable
       result = my_array[0]
       my_array.my_each_with_index { |item, index| result = result.send(memo, item) unless index.zero? }
       result
-    elsif block_given?
-      result = my_array[0]   
-      my_array.my_each { |item| result = yield result, item }
-      result
-    else
+    elsif memo
       result = 0
       my_array.my_each { |item| result = yield memo, item }
       result
-    end    
+    else
+      result = my_array[0]
+      my_array.my_each_with_index { |item, index| result = yield result, item unless index.zero? }
+      result
+    end
   end
   # rubocop:enable Metrics/CyclomaticComplexity
   # rubocop:enable Metrics/PerceivedComplexity
