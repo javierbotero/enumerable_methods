@@ -46,7 +46,7 @@ module Enumerable
       my_array.my_each { |item| return false unless yield item }
       true
     elsif word
-      my_array.my_each { |item| return false unless n === item }
+      my_array.my_each { |item| return false unless word === item }
       true
     else
       my_all? { |item| item }
@@ -59,7 +59,7 @@ module Enumerable
       my_array.my_each { |item| return true if yield item }
       false
     elsif regex
-      my_array.my_each { return true if regex === my_array[i] }
+      my_array.my_each { |item| return true if regex === item }
       false
     else
       my_any? { |item| item }
@@ -115,23 +115,20 @@ module Enumerable
     if memo && symbol
       my_array.my_each { |item| memo = memo.send(symbol, item) }
       memo
-    elsif memo && block_given?
-      my_array.my_each { |item| memo = yield memo, item }
-      memo
     elsif memo.class == Symbol
       result = my_array[0]
       my_array.my_each_with_index { |item, index| result = result.send(memo, item) unless index.zero? }
       result
-    elsif memo.class == Integer
-      my_array.my_each { |item| memo = yield memo, item }
-      memo
+    elsif block_given?
+      result = my_array[0]   
+      my_array.my_each { |item| result = yield result, item }
+      result
     else
-      memo = my_array[0]
-      my_array.my_each_with_index { |item, index| memo = yield memo, item unless index.zero? }
-      memo
-    end
+      result = 0
+      my_array.my_each { |item| result = yield memo, item }
+      result
+    end    
   end
-
   # rubocop:enable Metrics/CyclomaticComplexity
   # rubocop:enable Metrics/PerceivedComplexity
 end
