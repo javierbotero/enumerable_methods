@@ -94,11 +94,11 @@ module Enumerable
   def my_map(proc = false)
     my_array = change_self
     arr = []
-    if block_given? && !proc
-      my_array.my_each { |item| arr.push(yield item) }
-      arr
-    elsif (block_given? && proc) || proc
+    if proc
       my_array.my_each { |item| arr.push(proc.call(item)) }
+      arr
+    elsif block_given?
+      my_array.my_each { |item| arr.push(yield item) }
       arr
     else
       to_enum
@@ -131,12 +131,8 @@ module Enumerable
 end
 # rubocop:enable Metrics/ModuleLength
 
-arr = [1, 2, 3, 4]
-
 def multiply_els(els)
   els.my_inject(:*)
 end
-
-puts multiply_els(arr)
 
 # rubocop:enable Style/CaseEquality
